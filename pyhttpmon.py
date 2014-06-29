@@ -123,7 +123,6 @@ if __name__ == '__main__':
         usepushbullet = config.get("usepushbullet")
         usepushover = config.get("usepushover")
         useemail = config.get("useemail")
-        print(useemail)
 
         if usepushbullet == True:
             #print("using pushbullet")
