@@ -23,19 +23,35 @@ ENDC = '\033[0m'
 
 def checkHTTP(dom):
     """
-    Perform a simple HTTP-Get Request. If the outcome is 200 Ok, everything
+    Perform a simple HTTP-Get Request. If the outcome is 200,302,301 everything
     is fine.
     """
     try:
         r = requests.get(dom, verify=False, allow_redirects=False)
-        if r.status_code is 200:
+        if r.status_code in [200, 302, 301]:
+            #print(r.status_code)
+            if r.status_code in [302, 301]:
+                # in case of redirect check wether the server location is identical to domain.
+                location = r.headers['Location']
+                location = location.replace("http://", "")
+                location = location.replace("https://", "")
+                containdom = dom
+                containdom = containdom.replace("http://", "")
+                containdom = containdom.replace("https://", "")
+
+                if containdom in location:
+                    #print("Host "+dom+OKGREEN+" ok."+ENDC)
+                    return True
+                else:
+                    #print("Host "+dom+FAILRED+" appreantly down."+ENDC)
+                    return False
+            # return False
             #print("Host "+dom+OKGREEN+" ok."+ENDC)
             return True
     except:
         pass
     #print("Host "+dom+FAILRED+" appreantly down."+ENDC)
     return False
-
 
 def notifyPushbullet(downlist):
     """
@@ -77,9 +93,9 @@ def notifyPushover(downlist):
     userkey = config.get("pushover_user_key")
 
     #prepare message
-    message = "The host(s): "
+    message = "The host(s): \n"
     for dom in downlist:
-        message += " "+dom+" "
+        message += " "+dom+" \n"
     message += "seems to be down."
 
     try:

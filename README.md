@@ -1,4 +1,4 @@
-Uses requests to monitor HTTP-servers for availability. Uses pushbullet, pushover or e-Mail for notification if host unreachable.
+Uses requests to monitor HTTP-servers for availability. Uses pushbullet, pushover or e-Mail for notification if host is unreachable.
 
 ## usage
 
