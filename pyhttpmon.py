@@ -7,6 +7,7 @@ __version__ = (0, 0, 1)
 
 import requests
 from pushbullet import PushBullet
+import pushover
 import smtplib
 import kaptan
 import os
@@ -65,7 +66,28 @@ def notifyPushbullet(downlist):
     for deviceno in devices:
         device = pb.get(deviceno)
         push = device.push_note("server monitor", message)
+        if (push is None) or (push.status_code is not 200):
+            return False
+    return True
 
+def notifyPushover(downlist):
+    """
+    """
+    appkey = config.get("pushover_app_key")
+    userkey = config.get("pushover_user_key")
+
+    #prepare message
+    message = "The host(s): "
+    for dom in downlist:
+        message += " "+dom+" "
+    message += "seems to be down."
+
+    try:
+        client = pushover.PushoverClient(appkey, userkey)
+        client.send_message(message)
+    except Exception as e:
+        return False
+    return True
 
 def notifyEMail(downlist):
     """
@@ -74,20 +96,20 @@ def notifyEMail(downlist):
 
     emailfrom = config.get("emailfrom")
     emailto = config.get("emailto")
+
     #prepare message
     message = "The host(s): \n"
     for dom in downlist:
         message += " "+dom+" \n"
     message += "seems to be down."
 
-    template = "From: pyhttpmon <{FROMMAIL}>\n To: <{TO}> \nSubject: pyhttpmon\n\n{DOWNMESSAGE}"
+    template = "From: <{FROMMAIL}>\n To: <{TO}> \nSubject: server potentially down\n\n{DOWNMESSAGE}"
     body = template.format(FROMMAIL=emailfrom, TO=emailto, DOWNMESSAGE=message)
-    print("the body: "+body)
     try:
         smtpObj = smtplib.SMTP('localhost')
         smtpObj.sendmail(emailfrom, emailto, body)
     except Exception as e:
-        print("failed to send mail "+e)
+        #print("failed to send mail "+e)
         pass
 
 if __name__ == '__main__':
@@ -95,8 +117,22 @@ if __name__ == '__main__':
     for dom in config.get("doms"):
         if checkHTTP(dom) is False:
             downlist.append(dom)
+
     if(len(downlist) > 0):
-        if config.get("usepushbullet") is True:
-            notifyPushbullet(downlist)
-        if config.get("useemail") is True:
+        pushsuccess = False
+        usepushbullet = config.get("usepushbullet")
+        usepushover = config.get("usepushover")
+        useemail = config.get("useemail")
+        print(useemail)
+
+        if usepushbullet == True:
+            #print("using pushbullet")
+            pushsuccess = notifyPushbullet(downlist)
+
+        if usepushover == True:
+            #print("using pushover")
+            pushsuccess = notifyPushover(downlist)
+
+        if (pushsuccess == False) or (useemail == True):
+            #print("sending mail")
             notifyEMail(downlist)

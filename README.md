@@ -19,7 +19,7 @@ Uses requests to monitor HTTP-servers for availability. Uses pushbullet or e-Mai
 * Configure Pushbullet https://www.pushbullet.com/account
 * Test the script `python3.2 pyhttpmon.py `
 * Install conjob (e.g. `crontab -e`)
-* `@daily python3.2 ~/pyhttpmon/pyhttpmon.py`
+* `@hourly /usr/local/bin/python3.2 ~/pyhttpmon/pyhttpmon.py`
 
 ## development
 
