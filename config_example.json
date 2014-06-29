@@ -1,0 +1,15 @@
+{
+  "doms": [
+    "https://github.com/",
+    "http://aabb.asd"
+  ],
+  "usepushbullet": true,
+  "pushbullet_api_key": "see https://www.pushbullet.com/account",
+  "pushbullet_target_dev": "",
+  "_comment_target_dev_example_": "empty string = all devices",
+  "_comment_target_dev_example_": "LGE Nexus 4 4.4.4",
+  "usepushover": false,
+  "useemail": true,
+  "emailfrom": "dev@alcacer.de",
+  "emailto": "dev@alcacer.de"
+}

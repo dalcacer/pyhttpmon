@@ -1,0 +1,4 @@
+env
+*.pyc
+config.json
+.DS_Store
