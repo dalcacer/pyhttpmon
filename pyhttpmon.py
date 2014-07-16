@@ -11,6 +11,8 @@ import pushover
 import smtplib
 import kaptan
 import os
+import logging
+
 dirname, filename = os.path.split(os.path.abspath(__file__))
 config = kaptan.Kaptan(handler="json")
 config.import_config(dirname+"/config.json")
@@ -129,12 +131,16 @@ def notifyEMail(downlist):
         pass
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='log',level=logging.INFO, format='%(asctime)s %(message)s')
+
     downlist = []
     for dom in config.get("doms"):
         if checkHTTP(dom) is False:
+            logging.info(dom+" unreachable.")
             downlist.append(dom)
 
     if(len(downlist) > 0):
+
         pushsuccess = False
         usepushbullet = config.get("usepushbullet")
         usepushover = config.get("usepushover")
@@ -147,6 +153,9 @@ if __name__ == '__main__':
         if usepushover == True:
             #print("using pushover")
             pushsuccess = notifyPushover(downlist)
+
+        if (pushsuccess == False):
+            logging.warning("Unable to push message.")
 
         if (pushsuccess == False) or (useemail == True):
             #print("sending mail")
